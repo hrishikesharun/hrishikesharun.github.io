@@ -44,6 +44,11 @@ const MIN_TILES = 2; /* below this the ring looks broken, so hide the section */
    near the entry, where y is at its lowest and perspective magnifies most,
    which is what made the tiles look oversized and too low. */
 const SPREAD = 0.45;
+const PERSP = 1200; /* must match the perspective on .gallery-pin in the CSS */
+const CAP_H = 66; /* room the caption occupies below a tile */
+const EDGE_MARGIN = 26; /* breathing room above and below the ring */
+const TILT_MAX = 170; /* how far the ring may lean when there is height to spare */
+const TILT_MIN = 45; /* below this the ring reads flat rather than tilted */
 const ENTRY_END = 0.12; /* tile has finished sliding in by here */
 const EXIT_START = 0.88; /* tile starts sliding out here */
 const FADE = 0.06; /* fraction of a tile's life spent fading */
@@ -63,16 +68,22 @@ export async function initGallery() {
   if (!matchMedia('(min-width:901px)').matches) return;
 
   const vw = innerWidth;
-  const tileW = Math.min(Math.max(178, vw * 0.196), 296);
+  const vh = innerHeight;
+  const tileW = Math.min(Math.max(170, vw * 0.175), 260);
   const tileH = (tileW * 2) / 3;
 
   /* Orbit radii. rx is wider than rz so the ring reads as an ellipse in
-     perspective rather than a circle seen head on. */
+     perspective rather than a circle seen head on. rz also sets how hard
+     the perspective magnifies at the near point, so it is kept well under
+     the CSS perspective distance. */
   const rx = vw * 0.34;
-  const rz = 500;
-  const tiltY = 180;
+  const rz = 420;
   const offX = vw * 0.85; /* how far off screen tiles enter and exit */
   const entryAngle = Math.PI / 2;
+
+  /* Assigned once the tiles exist, because it depends on how tall the
+     tallest one turned out. See the fit calculation below. */
+  let tiltY = 0;
 
   /* Cylinder geometry for the bend. The radius is the mean of the two
      orbit radii so the curve of a tile matches the curve of its path. */
@@ -83,7 +94,7 @@ export async function initGallery() {
      tall one, and they still carry equal visual weight in the ring. */
   const AREA = tileW * tileH;
   const MAX_W = tileW * 1.45;
-  const MAX_H = tileH * 1.85;
+  const MAX_H = tileH * 1.5;
 
   /* ---------- collect the images ---------- */
   /* One project can contribute several tiles. The arc reads project.image,
@@ -155,7 +166,7 @@ export async function initGallery() {
       slice.style.transform = `rotateY(${((s - (SLICES - 1) / 2) * stepDeg).toFixed(2)}deg)`;
       /* Diagrams exported on white need inverting or they punch a hole in
          the dark page. Set invert: true on the project to opt in. */
-      if (project.invert) slice.style.filter = 'invert(1) grayscale(1) contrast(1.05)';
+      if (project.invert) slice.style.filter = 'invert(1)';
       tile.appendChild(slice);
     }
 
@@ -187,6 +198,22 @@ export async function initGallery() {
      short list spreads out instead of bunching near the entry. */
   const stagger = tiles.length > 1 ? SPREAD / (tiles.length - 1) : 0;
   const totalRange = 1 + stagger * (tiles.length - 1);
+
+  /* ---------- make the ring fit the viewport ----------
+     The worst case for vertical overflow is the entry and exit phase: a tile
+     is at its lowest, y = tiltY, at the same moment it is nearest the camera
+     at z = rz, where perspective magnifies everything by PERSP/(PERSP - rz).
+     Its caption hangs below it too. Rather than guess a tilt and hope, solve
+     for the largest tilt whose lowest point still lands inside the viewport:
+
+       (tiltY + tallestHalf + captionHeight) * nearScale  <=  vh/2 - MARGIN
+
+     Hardcoding tiltY at 180 is what pushed the tiles off the bottom of the
+     screen, so only their top halves were visible. */
+  const tallestHalf = Math.max(...tiles.map((t) => parseFloat(t.style.height))) / 2;
+  const nearScale = PERSP / (PERSP - rz);
+  const budget = vh / 2 - EDGE_MARGIN;
+  tiltY = Math.max(TILT_MIN, Math.min(TILT_MAX, budget / nearScale - tallestHalf - CAP_H));
 
   /* ---------- wrap phrase words so they can resolve individually ---------- */
   const words = [];
