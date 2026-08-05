@@ -24,6 +24,7 @@ export const projects = [
     title: 'Jenny.ai',
     year: '2026',
     image: asset('jenny.png'),
+    fit: 'contain', /* a UI screenshot, show all of it rather than crop it */
     description:
       'A multi-agent desktop assistant that takes real actions rather than just answering. Tool orchestration, retrieval over a persistent memory store, streaming responses with inspectable tool receipts, and a human-in-the-loop approval gate before anything executes.',
     tags: ['Claude API', 'RAG', 'Electron', 'React', 'Python', 'WebSocket'],
@@ -33,25 +34,26 @@ export const projects = [
     year: '2023',
     image: null, /* add assets/projects/prosthetic-hand.jpg here */
     description:
-      'Led the design of a tendon-driven prosthetic hand from concept through CAD to a working prototype. Fingers split into two sections with slanted tips for grip, fishing wire routed through pulleys to servo motors to close them, and nylon elastic cord to return them open. Hollow palm housing the electronics, with accelerometer and temperature sensing inside and force sensing on the outer surface. Judged best biomedical engineering design in the cohort.',
+      'Led a four person team designing a 3D printed paediatric prosthetic hand, built from child-safe materials with shock absorption and thermal safety designed in. Fingers split into two sections with slanted tips for grip, fishing wire routed through pulleys to servo motors to close them, and nylon elastic cord to return them open. Hollow palm housing the electronics, with accelerometer and temperature sensing inside and force sensing on the outer surface. Awarded best biomedical engineering design in the cohort.',
     tags: ['Fusion 360', 'Servo actuation', 'Arduino', 'Sensor integration', 'Team lead'],
   },
   {
     title: 'Mechanical gripper',
     year: '2025',
-    image: null,
+    image: null, /* add assets/projects/gripper.jpg here */
     description:
-      'A two-jaw mechanical gripper driven by a rack and pinion pair off a single stepper motor, so both jaws stay synchronised from one actuator. Fully 3D printed, with the gear train and jaw travel sized to keep the mechanism backdrivable.',
-    tags: ['Rack and pinion', '3D printing', 'Stepper control', 'Mechanism design'],
+      'A two-jaw gripper designed in Fusion 360 and 3D printed, driven through a gear train off a single Dynamixel servo so both jaws stay synchronised from one actuator. Tested against objects of varying shape and size, and it held all of them.',
+    tags: ['Fusion 360', '3D printing', 'Dynamixel servo', 'Mechanism design'],
   },
   {
     title: 'NHS patient management system',
     year: '2025',
     image: asset('nhs-flowchart.png'),
-    invert: true, /* exported on white, inverted to sit on the dark page */
+    invert: true, /* exported on white, flipped to sit on the dark page */
+    fit: 'contain', /* a tall flowchart, letterbox it rather than crop it */
     description:
-      'A menu-driven patient records system covering the full clinical admin loop: register and look up patients, update symptoms and medical history, schedule and cancel appointments, and discharge. Records persist to disk on exit, with validation and error handling on every branch rather than only the happy path.',
-    tags: ['Data structures', 'File persistence', 'Healthcare records', 'Validation'],
+      'A C++ patient database simulating the full clinical admin loop: registration, record updates, secure search, symptom and medical history edits, appointment scheduling and cancellation, and discharge. Records persist to disk on exit, with validation on every branch rather than only the happy path.',
+    tags: ['C++', 'Data structures', 'File persistence', 'Healthcare records'],
   },
   {
     title: 'Final year individual project',

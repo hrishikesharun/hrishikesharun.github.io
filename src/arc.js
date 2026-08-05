@@ -73,6 +73,9 @@ export function initArc() {
         pImg.src = project.image;
         pImg.classList.add('on');
         pImg.classList.toggle('inv', !!project.invert);
+        /* Screenshots and diagrams are shown whole. Cropping a flowchart to
+           fill the frame is how it became unreadable in the first place. */
+        pImg.classList.toggle('fit', project.fit === 'contain');
         pKind.classList.remove('on');
       } else {
         pImg.removeAttribute('src');

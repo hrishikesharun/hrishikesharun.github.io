@@ -126,7 +126,9 @@ section{position:relative}
   filter:grayscale(1);opacity:0;transition:opacity .5s var(--ease)}
 .proj-frame img.on{opacity:.9}
 /* Diagrams exported on a white background, flipped to sit on the dark page */
-.proj-frame img.inv{filter:invert(1) grayscale(1)}
+.proj-frame img.inv{filter:invert(1) grayscale(1);background:#fff}
+/* Screenshots and diagrams shown whole rather than cropped to fill */
+.proj-frame img.fit{object-fit:contain}
 .proj-frame .ph{position:absolute;inset:0;display:grid;place-items:center;padding:22px;
   text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
   color:#4A5052;opacity:0;transform:scale(1.05);
@@ -187,6 +189,13 @@ section{position:relative}
 .role .when{font-family:var(--mono);font-size:11px;letter-spacing:.13em;color:var(--muted);white-space:nowrap}
 .role .org{font-size:13px;color:var(--accent);margin-top:5px}
 .role p{margin-top:11px;font-size:14px;line-height:1.62;color:var(--muted);max-width:56ch}
+
+/* ---------- EDUCATION ---------- */
+/* Reuses .role so the entries animate and sit on the same rhythm as
+   Experience, but full width with no accompanying photograph. */
+.edu{padding:clamp(90px,15vh,180px) var(--pad);border-top:1px solid var(--line)}
+.edu .role{max-width:none}
+.edu .role p{max-width:72ch}
 
 /* ---------- CAPABILITIES ---------- */
 .skills{padding:clamp(90px,15vh,180px) var(--pad);border-top:1px solid var(--line)}

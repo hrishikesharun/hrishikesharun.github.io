@@ -33,7 +33,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import { projects } from './data/projects.js';
 
 const SLICES = 10; /* vertical cuts per image tile, more = smoother curve */
-const MIN_TILES = 3; /* below this the ring looks broken, so hide the section */
+const MIN_TILES = 2; /* below this the ring looks broken, so hide the section */
 const STAGGER = 0.09; /* normalised offset between consecutive tiles */
 const ENTRY_END = 0.12; /* tile has finished sliding in by here */
 const EXIT_START = 0.88; /* tile starts sliding out here */
@@ -43,7 +43,7 @@ const PHRASE_END = 0.75;
 const PHRASE_TRAVEL = 200; /* px of vertical drift across the phrase */
 const BLUR = 8; /* px blur each word resolves from */
 
-export function initGallery() {
+export async function initGallery() {
   const section = document.getElementById('gallery');
   const pin = document.getElementById('gallery-pin');
   const phrase = document.getElementById('cg-phrase');
@@ -82,11 +82,40 @@ export function initGallery() {
     return;
   }
 
-  const tiles = shown.map((project) => {
+  /* Measure every image before building, because the slices need the real
+     aspect ratio. Forcing background-size to the tile box squashes anything
+     that is not 3:2, which is what made the UI screenshots and the tall
+     flowchart unreadable. Falls back to the tile box if a load fails. */
+  const sizes = await Promise.all(
+    shown.map(
+      (p) =>
+        new Promise((resolve) => {
+          const probe = new Image();
+          probe.onload = () => resolve({ w: probe.naturalWidth, h: probe.naturalHeight });
+          probe.onerror = () => resolve({ w: tileW, h: tileH });
+          probe.src = p.image;
+        })
+    )
+  );
+
+  const tiles = shown.map((project, idx) => {
     const tile = document.createElement('div');
     tile.className = 'cg-tile';
     tile.style.width = `${tileW.toFixed(1)}px`;
     tile.style.height = `${tileH.toFixed(1)}px`;
+
+    /* cover fills the tile and crops the overflow, which suits photographs.
+       contain fits the whole image inside and letterboxes, which suits
+       screenshots and diagrams where cropping would lose the content. */
+    const nat = sizes[idx];
+    const contain = project.fit === 'contain';
+    const scale = contain
+      ? Math.min(tileW / nat.w, tileH / nat.h)
+      : Math.max(tileW / nat.w, tileH / nat.h);
+    const drawW = nat.w * scale;
+    const drawH = nat.h * scale;
+    const offX = (tileW - drawW) / 2;
+    const offY = (tileH - drawH) / 2;
 
     /* Reassemble the image from rotated vertical slices to bend it onto a
        cylinder, so it curves with the orbit instead of reading as a flat
@@ -98,10 +127,13 @@ export function initGallery() {
       slice.style.width = `${w.toFixed(1)}px`;
       slice.style.marginLeft = `${(-w / 2).toFixed(1)}px`;
       slice.style.backgroundImage = `url(${project.image})`;
-      slice.style.backgroundSize = `${tileW.toFixed(1)}px ${tileH.toFixed(1)}px`;
-      slice.style.backgroundPosition = `${(-s * sliceW).toFixed(1)}px 0`;
+      slice.style.backgroundSize = `${drawW.toFixed(1)}px ${drawH.toFixed(1)}px`;
+      slice.style.backgroundPosition = `${(offX - s * sliceW).toFixed(1)}px ${offY.toFixed(1)}px`;
       slice.style.transformOrigin = `50% 50% ${(-cylR).toFixed(1)}px`;
       slice.style.transform = `rotateY(${((s - (SLICES - 1) / 2) * stepDeg).toFixed(2)}deg)`;
+      /* Letterbox bars sit on the slice, not the tile, so the backdrop bends
+         with the image instead of floating as a flat plane behind it. */
+      if (contain) slice.style.backgroundColor = project.invert ? '#fff' : '#0E1011';
       /* Diagrams exported on white need inverting or they punch a hole in
          the dark page. Set invert: true on the project to opt in. */
       if (project.invert) slice.style.filter = 'invert(1) grayscale(1) contrast(1.05)';
