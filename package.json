@@ -1,0 +1,19 @@
+{
+  "name": "hrishikesh-arun-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Personal portfolio site. Vanilla JS, WebGL2 hero shader, GSAP ScrollTrigger, Lenis smooth scroll.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "gsap": "3.12.5",
+    "lenis": "1.1.13"
+  },
+  "devDependencies": {
+    "vite": "^8.2.0"
+  }
+}
