@@ -158,6 +158,15 @@ section{position:relative}
 .cg-slice{position:absolute;top:0;left:50%;height:100%;will-change:transform;
   background-repeat:no-repeat;filter:grayscale(1) contrast(1.05)}
 
+/* Caption hangs below each tile. Fixed width and centred so the JS only has
+   to supply the counter-rotation that keeps it facing the viewer. */
+.cg-cap{position:absolute;top:100%;left:50%;width:210px;margin-left:-105px;margin-top:13px;
+  text-align:center;pointer-events:none}
+.cg-cap-title{display:block;font-family:var(--display);font-weight:500;font-size:13.5px;
+  letter-spacing:-.012em;color:var(--fg)}
+.cg-cap-desc{display:block;margin-top:5px;font-family:var(--mono);font-size:9.5px;
+  line-height:1.55;letter-spacing:.05em;color:var(--muted)}
+
 .cg-phrase{position:absolute;z-index:900;pointer-events:none;opacity:0;
   max-width:19ch;text-align:center;
   font-family:var(--display);font-weight:500;

@@ -22,31 +22,39 @@ const asset = (file) => `${import.meta.env.BASE_URL}assets/projects/${file}`;
 export const projects = [
   {
     title: 'Jenny.ai',
+    blurb: 'Multi-agent desktop assistant that takes real actions.',
     year: '2026',
     image: asset('jenny.png'),
     fit: 'contain', /* a UI screenshot, show all of it rather than crop it */
+    scale: 1.3, /* the flagship build, given more presence in the ring */
     description:
       'A multi-agent desktop assistant that takes real actions rather than just answering. Tool orchestration, retrieval over a persistent memory store, streaming responses with inspectable tool receipts, and a human-in-the-loop approval gate before anything executes.',
     tags: ['Claude API', 'RAG', 'Electron', 'React', 'Python', 'WebSocket'],
   },
   {
     title: 'Prosthetic hand',
+    blurb: '3D printed paediatric hand. Best design in cohort.',
     year: '2023',
-    image: null, /* add assets/projects/prosthetic-hand.jpg here */
+    /* Pre-wired. Each of these joins the ring the moment the file exists in
+       public/assets/projects, and is silently skipped until then. */
+    image: asset('prosthetic-hand.jpg'),
+    gallery: [asset('prosthetic-hand.jpg'), asset('prosthetic-hand-cad.png')],
     description:
       'Led a four person team designing a 3D printed paediatric prosthetic hand, built from child-safe materials with shock absorption and thermal safety designed in. Fingers split into two sections with slanted tips for grip, fishing wire routed through pulleys to servo motors to close them, and nylon elastic cord to return them open. Hollow palm housing the electronics, with accelerometer and temperature sensing inside and force sensing on the outer surface. Awarded best biomedical engineering design in the cohort.',
     tags: ['Fusion 360', 'Servo actuation', 'Arduino', 'Sensor integration', 'Team lead'],
   },
   {
     title: 'Mechanical gripper',
+    blurb: 'Gear-driven jaws that hold any shape.',
     year: '2025',
-    image: null, /* add assets/projects/gripper.jpg here */
+    image: asset('gripper.jpg'), /* pre-wired, appears once the file is saved */
     description:
       'A two-jaw gripper designed in Fusion 360 and 3D printed, driven through a gear train off a single Dynamixel servo so both jaws stay synchronised from one actuator. Tested against objects of varying shape and size, and it held all of them.',
     tags: ['Fusion 360', '3D printing', 'Dynamixel servo', 'Mechanism design'],
   },
   {
     title: 'NHS patient management system',
+    blurb: 'C++ patient database with secure search.',
     year: '2025',
     image: asset('nhs-flowchart.png'),
     invert: true, /* exported on white, flipped to sit on the dark page */
@@ -57,6 +65,7 @@ export const projects = [
   },
   {
     title: 'Final year individual project',
+    blurb: 'Wearable diagnostics. Awaiting allocation.',
     year: '2027',
     image: null,
     description:

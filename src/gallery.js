@@ -34,7 +34,14 @@ import { projects } from './data/projects.js';
 
 const SLICES = 10; /* vertical cuts per image tile, more = smoother curve */
 const MIN_TILES = 2; /* below this the ring looks broken, so hide the section */
-const STAGGER = 0.09; /* normalised offset between consecutive tiles */
+/* How much of the orbit the tiles fan across, in normalised time. The first
+   build used 6 tiles at 0.09 apart, so 5 * 0.09 = 0.45, which spreads them
+   over 0.45/0.76 of a revolution, about 213 degrees of arc. Deriving the
+   stagger from this instead of fixing it means any number of tiles fans
+   across the same span. With a fixed stagger a short list bunches together
+   near the entry, where y is at its lowest and perspective magnifies most,
+   which is what made the tiles look oversized and too low. */
+const SPREAD = 0.45;
 const ENTRY_END = 0.12; /* tile has finished sliding in by here */
 const EXIT_START = 0.88; /* tile starts sliding out here */
 const FADE = 0.06; /* fraction of a tile's life spent fading */
@@ -54,7 +61,7 @@ export async function initGallery() {
   if (!matchMedia('(min-width:901px)').matches) return;
 
   const vw = innerWidth;
-  const tileW = Math.min(Math.max(150, vw * 0.16), 240);
+  const tileW = Math.min(Math.max(178, vw * 0.196), 296);
   const tileH = (tileW * 2) / 3;
 
   /* Orbit radii. rx is wider than rz so the ring reads as an ellipse in
@@ -68,54 +75,67 @@ export async function initGallery() {
   /* Cylinder geometry for the bend. The radius is the mean of the two
      orbit radii so the curve of a tile matches the curve of its path. */
   const cylR = (rx + rz) / 2;
-  const sliceW = tileW / SLICES;
-  const stepDeg = (tileW / cylR) * (180 / Math.PI) / SLICES;
+  /* Every tile is given the same AREA rather than the same box, then takes
+     its own image's aspect ratio. Nothing is letterboxed and nothing is
+     cropped, a wide screenshot gets a wide tile and a tall diagram gets a
+     tall one, and they still carry equal visual weight in the ring. */
+  const AREA = tileW * tileH;
+  const MAX_W = tileW * 1.45;
+  const MAX_H = tileH * 1.85;
 
-  /* ---------- build tiles ---------- */
-  /* Images only. The arc is the reader, this is the spectacle, so a project
-     with nothing to show simply does not appear in the ring. A ring of one
-     or two reads as broken rather than sparse, so below MIN_TILES the whole
-     section removes itself and the page flows straight past it. */
-  const shown = projects.filter((p) => p.image);
-  if (shown.length < MIN_TILES) {
+  /* ---------- collect the images ---------- */
+  /* One project can contribute several tiles. The arc reads project.image,
+     the ring walks project.gallery when present so a build photo and a CAD
+     sheet can both orbit while still belonging to the same entry. */
+  const wanted = projects.flatMap((p) => {
+    const list = p.gallery || (p.image ? [p.image] : []);
+    return list.map((src) => ({ project: p, src }));
+  });
+
+  /* Measure first. A src that fails to load is dropped rather than left as
+     an empty ghost tile, which also means paths can be wired ahead of the
+     files existing: each one joins the ring the moment it is saved. */
+  const measured = (
+    await Promise.all(
+      wanted.map(
+        (item) =>
+          new Promise((resolve) => {
+            const probe = new Image();
+            probe.onload = () =>
+              resolve({ ...item, natW: probe.naturalWidth, natH: probe.naturalHeight });
+            probe.onerror = () => resolve(null);
+            probe.src = item.src;
+          })
+      )
+    )
+  ).filter(Boolean);
+
+  if (measured.length < MIN_TILES) {
     section.remove();
     return;
   }
 
-  /* Measure every image before building, because the slices need the real
-     aspect ratio. Forcing background-size to the tile box squashes anything
-     that is not 3:2, which is what made the UI screenshots and the tall
-     flowchart unreadable. Falls back to the tile box if a load fails. */
-  const sizes = await Promise.all(
-    shown.map(
-      (p) =>
-        new Promise((resolve) => {
-          const probe = new Image();
-          probe.onload = () => resolve({ w: probe.naturalWidth, h: probe.naturalHeight });
-          probe.onerror = () => resolve({ w: tileW, h: tileH });
-          probe.src = p.image;
-        })
-    )
-  );
-
-  const tiles = shown.map((project, idx) => {
+  const tiles = measured.map(({ project, src, natW, natH }) => {
     const tile = document.createElement('div');
     tile.className = 'cg-tile';
-    tile.style.width = `${tileW.toFixed(1)}px`;
-    tile.style.height = `${tileH.toFixed(1)}px`;
 
-    /* cover fills the tile and crops the overflow, which suits photographs.
-       contain fits the whole image inside and letterboxes, which suits
-       screenshots and diagrams where cropping would lose the content. */
-    const nat = sizes[idx];
-    const contain = project.fit === 'contain';
-    const scale = contain
-      ? Math.min(tileW / nat.w, tileH / nat.h)
-      : Math.max(tileW / nat.w, tileH / nat.h);
-    const drawW = nat.w * scale;
-    const drawH = nat.h * scale;
-    const offX = (tileW - drawW) / 2;
-    const offY = (tileH - drawH) / 2;
+    /* Equal area, native aspect, then clamped without distorting. An optional
+       per-project scale lets a flagship piece carry more weight than the rest
+       of the ring. Squaring it keeps scale a multiplier on the edge lengths
+       rather than on the area. */
+    const k = project.scale || 1;
+    const ratio = natW / natH;
+    let w = Math.sqrt(AREA * k * k * ratio);
+    let h = Math.sqrt((AREA * k * k) / ratio);
+    const clamp = Math.min(1, (MAX_W * k) / w, (MAX_H * k) / h);
+    w *= clamp;
+    h *= clamp;
+
+    tile.style.width = `${w.toFixed(1)}px`;
+    tile.style.height = `${h.toFixed(1)}px`;
+
+    const sliceW = w / SLICES;
+    const stepDeg = ((w / cylR) * (180 / Math.PI)) / SLICES;
 
     /* Reassemble the image from rotated vertical slices to bend it onto a
        cylinder, so it curves with the orbit instead of reading as a flat
@@ -123,29 +143,48 @@ export async function initGallery() {
     for (let s = 0; s < SLICES; s++) {
       const slice = document.createElement('div');
       slice.className = 'cg-slice';
-      const w = sliceW + 1.5; /* overlap hides subpixel gaps between slices */
-      slice.style.width = `${w.toFixed(1)}px`;
-      slice.style.marginLeft = `${(-w / 2).toFixed(1)}px`;
-      slice.style.backgroundImage = `url(${project.image})`;
-      slice.style.backgroundSize = `${drawW.toFixed(1)}px ${drawH.toFixed(1)}px`;
-      slice.style.backgroundPosition = `${(offX - s * sliceW).toFixed(1)}px ${offY.toFixed(1)}px`;
+      const sw = sliceW + 1.5; /* overlap hides subpixel gaps between slices */
+      slice.style.width = `${sw.toFixed(1)}px`;
+      slice.style.marginLeft = `${(-sw / 2).toFixed(1)}px`;
+      slice.style.backgroundImage = `url(${src})`;
+      slice.style.backgroundSize = `${w.toFixed(1)}px ${h.toFixed(1)}px`;
+      slice.style.backgroundPosition = `${(-s * sliceW).toFixed(1)}px 0`;
       slice.style.transformOrigin = `50% 50% ${(-cylR).toFixed(1)}px`;
       slice.style.transform = `rotateY(${((s - (SLICES - 1) / 2) * stepDeg).toFixed(2)}deg)`;
-      /* Letterbox bars sit on the slice, not the tile, so the backdrop bends
-         with the image instead of floating as a flat plane behind it. */
-      if (contain) slice.style.backgroundColor = project.invert ? '#fff' : '#0E1011';
       /* Diagrams exported on white need inverting or they punch a hole in
          the dark page. Set invert: true on the project to opt in. */
       if (project.invert) slice.style.filter = 'invert(1) grayscale(1) contrast(1.05)';
       tile.appendChild(slice);
     }
 
+    /* Caption rides below the tile. It sits outside the sliced surface so it
+       stays crisp, and gets counter-rotated each frame in the update loop so
+       the text always faces the viewer instead of turning edge on and
+       mirroring as the tile spins. */
+    const cap = document.createElement('div');
+    cap.className = 'cg-cap';
+    const capTitle = document.createElement('span');
+    capTitle.className = 'cg-cap-title';
+    capTitle.textContent = project.title;
+    cap.appendChild(capTitle);
+    if (project.blurb) {
+      const capDesc = document.createElement('span');
+      capDesc.className = 'cg-cap-desc';
+      capDesc.textContent = project.blurb;
+      cap.appendChild(capDesc);
+    }
+    tile.appendChild(cap);
+    tile.__cap = cap;
+
     tile.style.opacity = '0';
     pin.appendChild(tile);
     return tile;
   });
 
-  const totalRange = 1 + STAGGER * (tiles.length - 1);
+  /* Fan the tiles across a fixed span of the orbit whatever the count, so a
+     short list spreads out instead of bunching near the entry. */
+  const stagger = tiles.length > 1 ? SPREAD / (tiles.length - 1) : 0;
+  const totalRange = 1 + stagger * (tiles.length - 1);
 
   /* ---------- wrap phrase words so they can resolve individually ---------- */
   const words = [];
@@ -201,7 +240,7 @@ export async function initGallery() {
       const progress = self.progress;
 
       tiles.forEach((tile, i) => {
-        const t = progress * totalRange - i * STAGGER;
+        const t = progress * totalRange - i * stagger;
 
         if (t <= 0 || t >= 1) {
           tile.style.opacity = '0';
@@ -213,11 +252,15 @@ export async function initGallery() {
         else if (t > 1 - FADE) alpha = (1 - t) / FADE;
 
         const pos = getPos(t);
+        const rotDeg = (pos.rotY * 180) / Math.PI;
         tile.style.transform =
           `translate3d(${pos.x.toFixed(1)}px,${pos.y.toFixed(1)}px,${pos.z.toFixed(1)}px)` +
-          ` rotateY(${((pos.rotY * 180) / Math.PI).toFixed(1)}deg)`;
+          ` rotateY(${rotDeg.toFixed(1)}deg)`;
         tile.style.opacity = alpha;
         tile.style.zIndex = Math.round(pos.z + 600);
+        /* Undo the tile's spin so the caption stays readable and forward
+           facing all the way round the orbit. */
+        tile.__cap.style.transform = `rotateY(${(-rotDeg).toFixed(1)}deg)`;
       });
 
       /* ---------- phrase ---------- */
