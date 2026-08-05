@@ -17,13 +17,13 @@
    here. This array is projects only.
    ============================================================ */
 
-const asset = (file) => `${import.meta.env.BASE_URL}assets/${file}`;
+const asset = (file) => `${import.meta.env.BASE_URL}assets/projects/${file}`;
 
 export const projects = [
   {
     title: 'Jenny.ai',
     year: '2026',
-    image: null,
+    image: asset('jenny.png'),
     description:
       'A multi-agent desktop assistant that takes real actions rather than just answering. Tool orchestration, retrieval over a persistent memory store, streaming responses with inspectable tool receipts, and a human-in-the-loop approval gate before anything executes.',
     tags: ['Claude API', 'RAG', 'Electron', 'React', 'Python', 'WebSocket'],
@@ -31,7 +31,7 @@ export const projects = [
   {
     title: 'Prosthetic hand',
     year: '2023',
-    image: null,
+    image: null, /* add assets/projects/prosthetic-hand.jpg here */
     description:
       'Led the design of a tendon-driven prosthetic hand from concept through CAD to a working prototype. Fingers split into two sections with slanted tips for grip, fishing wire routed through pulleys to servo motors to close them, and nylon elastic cord to return them open. Hollow palm housing the electronics, with accelerometer and temperature sensing inside and force sensing on the outer surface. Judged best biomedical engineering design in the cohort.',
     tags: ['Fusion 360', 'Servo actuation', 'Arduino', 'Sensor integration', 'Team lead'],
@@ -47,7 +47,8 @@ export const projects = [
   {
     title: 'NHS patient management system',
     year: '2025',
-    image: null,
+    image: asset('nhs-flowchart.png'),
+    invert: true, /* exported on white, inverted to sit on the dark page */
     description:
       'A menu-driven patient records system covering the full clinical admin loop: register and look up patients, update symptoms and medical history, schedule and cancel appointments, and discharge. Records persist to disk on exit, with validation and error handling on every branch rather than only the happy path.',
     tags: ['Data structures', 'File persistence', 'Healthcare records', 'Validation'],

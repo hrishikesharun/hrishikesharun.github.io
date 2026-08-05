@@ -33,6 +33,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import { projects } from './data/projects.js';
 
 const SLICES = 10; /* vertical cuts per image tile, more = smoother curve */
+const MIN_TILES = 3; /* below this the ring looks broken, so hide the section */
 const STAGGER = 0.09; /* normalised offset between consecutive tiles */
 const ENTRY_END = 0.12; /* tile has finished sliding in by here */
 const EXIT_START = 0.88; /* tile starts sliding out here */
@@ -71,44 +72,40 @@ export function initGallery() {
   const stepDeg = (tileW / cylR) * (180 / Math.PI) / SLICES;
 
   /* ---------- build tiles ---------- */
-  const tiles = projects.map((project) => {
+  /* Images only. The arc is the reader, this is the spectacle, so a project
+     with nothing to show simply does not appear in the ring. A ring of one
+     or two reads as broken rather than sparse, so below MIN_TILES the whole
+     section removes itself and the page flows straight past it. */
+  const shown = projects.filter((p) => p.image);
+  if (shown.length < MIN_TILES) {
+    section.remove();
+    return;
+  }
+
+  const tiles = shown.map((project) => {
     const tile = document.createElement('div');
     tile.className = 'cg-tile';
     tile.style.width = `${tileW.toFixed(1)}px`;
     tile.style.height = `${tileH.toFixed(1)}px`;
 
-    if (project.image) {
-      /* Bent photograph: reassemble it from rotated vertical slices. */
-      tile.classList.add('cg-tile-img');
-      for (let s = 0; s < SLICES; s++) {
-        const slice = document.createElement('div');
-        slice.className = 'cg-slice';
-        const w = sliceW + 1.5; /* overlap hides subpixel gaps between slices */
-        slice.style.width = `${w.toFixed(1)}px`;
-        slice.style.marginLeft = `${(-w / 2).toFixed(1)}px`;
-        slice.style.backgroundImage = `url(${project.image})`;
-        slice.style.backgroundSize = `${tileW.toFixed(1)}px ${tileH.toFixed(1)}px`;
-        slice.style.backgroundPosition = `${(-s * sliceW).toFixed(1)}px 0`;
-        slice.style.transformOrigin = `50% 50% ${(-cylR).toFixed(1)}px`;
-        slice.style.transform = `rotateY(${((s - (SLICES - 1) / 2) * stepDeg).toFixed(2)}deg)`;
-        tile.appendChild(slice);
-      }
-    } else {
-      /* Typographic tile, mirroring the image-or-placeholder pattern the
-         work panel already uses. */
-      const card = document.createElement('div');
-      card.className = 'cg-card';
-      const year = document.createElement('span');
-      year.className = 'cg-year';
-      year.textContent = project.year;
-      const name = document.createElement('span');
-      name.className = 'cg-name';
-      name.textContent = project.title.toUpperCase();
-      const tag = document.createElement('span');
-      tag.className = 'cg-tag';
-      tag.textContent = project.tags[0];
-      card.append(year, name, tag);
-      tile.appendChild(card);
+    /* Reassemble the image from rotated vertical slices to bend it onto a
+       cylinder, so it curves with the orbit instead of reading as a flat
+       card on a curved path. */
+    for (let s = 0; s < SLICES; s++) {
+      const slice = document.createElement('div');
+      slice.className = 'cg-slice';
+      const w = sliceW + 1.5; /* overlap hides subpixel gaps between slices */
+      slice.style.width = `${w.toFixed(1)}px`;
+      slice.style.marginLeft = `${(-w / 2).toFixed(1)}px`;
+      slice.style.backgroundImage = `url(${project.image})`;
+      slice.style.backgroundSize = `${tileW.toFixed(1)}px ${tileH.toFixed(1)}px`;
+      slice.style.backgroundPosition = `${(-s * sliceW).toFixed(1)}px 0`;
+      slice.style.transformOrigin = `50% 50% ${(-cylR).toFixed(1)}px`;
+      slice.style.transform = `rotateY(${((s - (SLICES - 1) / 2) * stepDeg).toFixed(2)}deg)`;
+      /* Diagrams exported on white need inverting or they punch a hole in
+         the dark page. Set invert: true on the project to opt in. */
+      if (project.invert) slice.style.filter = 'invert(1) grayscale(1) contrast(1.05)';
+      tile.appendChild(slice);
     }
 
     tile.style.opacity = '0';

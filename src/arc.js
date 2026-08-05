@@ -72,6 +72,7 @@ export function initArc() {
       if (project.image) {
         pImg.src = project.image;
         pImg.classList.add('on');
+        pImg.classList.toggle('inv', !!project.invert);
         pKind.classList.remove('on');
       } else {
         pImg.removeAttribute('src');
