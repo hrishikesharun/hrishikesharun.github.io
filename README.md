@@ -86,7 +86,34 @@ distance and are clamped so the ends of the list never vanish completely. Raise
 
 Below 901px the pin is dropped and the list becomes tappable instead.
 
-### 4. Cursor, `src/cursor.js`
+### 4. Circle gallery, `src/gallery.js`
+
+A second pinned section where every project tile travels a full 360 degree orbit
+through 3D space as you scroll. Three things stack to produce it.
+
+**Orbit.** The pin wrapper carries a CSS `perspective`. Each tile is placed with
+`translate3d(x, y, z)` where `x` and `z` trace a circle and `y` is derived from
+`z`. Deriving `y` from `z` is the important part: it tilts the ring towards the
+viewer instead of leaving it flat and side on. `z` also drives `zIndex`, so tiles
+sort correctly against each other without a depth buffer.
+
+**Stagger.** Tile `i` runs at `progress * totalRange - i * STAGGER`, so each one
+trails the last around the ring rather than the whole set moving as a block.
+Tiles slide in from off screen left, orbit once, and exit right.
+
+**Bend.** A flat photograph on a curved path still reads flat. Tiles carrying an
+image are cut into vertical slices, each slice showing one band of the image
+through `background-position`, each rotated about a transform origin pushed back
+along `z`. That wraps the photo onto a cylinder so it curves with the orbit.
+Text tiles stay flat planes, because slicing live text would show seams at every
+cut. This mirrors the image-or-placeholder pattern the work panel already uses.
+
+The centre phrase resolves word by word out of an 8px blur between 25% and 75%
+of the section's scroll.
+
+Desktop only, hidden below 901px, which is the same breakpoint the arc uses.
+
+### 5. Cursor, `src/cursor.js`
 
 The dot chases the pointer on the GSAP ticker rather than being tweened per
 mousemove. `mousemove` only ever writes a target coordinate, so a fast flick
@@ -96,9 +123,9 @@ touch devices and below 861px.
 ## Project data
 
 The six projects live in `src/data/projects.js` as a single array and are
-rendered into the DOM at runtime by `src/arc.js`. To add, remove or reorder a
-project, edit that array only. Nothing else needs to change, and the arc maths
-adapts to the new length automatically.
+rendered into the DOM at runtime by both `src/arc.js` and `src/gallery.js`. To
+add, remove or reorder a project, edit that array only. Nothing else needs to
+change, and the arc and orbit maths both adapt to the new length automatically.
 
 Each entry takes `title`, `year`, `image`, `description` and `tags`. Set `image`
 to `null` to show the text placeholder instead of a preview, or point it at a
@@ -114,6 +141,7 @@ src/
   shader.js           GLSL and WebGL2 setup
   scroll.js           Lenis and ScrollTrigger
   arc.js              pinned project list
+  gallery.js          3D orbiting circle gallery
   cursor.js           lerped cursor
   style.css           all styles
   data/projects.js    the six projects

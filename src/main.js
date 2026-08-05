@@ -8,7 +8,8 @@
    3. split text    creates the .reveal-line spans that (4) queries
    4. reveals
    5. arc           renders the project <li> elements into the DOM
-   6. cursor        binds hover handlers to every li, so it has to
+   6. gallery       builds the orbiting tiles from the same data
+   7. cursor        binds hover handlers to every li, so it has to
                     run after (5) or the arc items get no hover state
    ============================================================ */
 
@@ -17,6 +18,7 @@ import gsap from 'gsap';
 import { initShader } from './shader.js';
 import { initSmoothScroll, initReveals } from './scroll.js';
 import { initArc } from './arc.js';
+import { initGallery } from './gallery.js';
 import { initCursor } from './cursor.js';
 
 /* 1 · hero background */
@@ -85,5 +87,8 @@ initReveals();
 /* 5 · the pinned arc, rendered from src/data/projects.js */
 initArc();
 
-/* 6 · cursor, last so it sees the arc items */
+/* 6 · the circle gallery, same data, further down the page */
+initGallery();
+
+/* 7 · cursor, last so it sees the arc items */
 initCursor();
