@@ -45,6 +45,10 @@ function splitChars(el) {
 const c1 = splitChars(document.getElementById('w1'));
 const c2 = splitChars(document.getElementById('w2'));
 
+/* Take ownership of the hidden state here rather than in CSS, so that a JS
+   failure leaves the name visible instead of stranding it at opacity 0. */
+gsap.set([...c1, ...c2], { yPercent: 112, opacity: 0 });
+
 document.querySelectorAll('[data-split]').forEach((p) => {
   p.innerHTML = `<span class="reveal-line"><span>${p.innerHTML}</span></span>`;
 });
@@ -80,6 +84,15 @@ function intro() {
 
 addEventListener('load', () => setTimeout(intro, 850));
 setTimeout(intro, 4000); /* failsafe: never strand the loader */
+
+/* Last line of defence for the wordmark. If the ticker is starved or a tween
+   is interrupted, the name would otherwise sit at opacity 0. It is the single
+   most important element on the page, so force it visible if anything is
+   still hidden well after the intro should have finished. */
+setTimeout(() => {
+  const stuck = [...c1, ...c2].filter((s) => Number(getComputedStyle(s).opacity) < 1);
+  if (stuck.length) gsap.set(stuck, { yPercent: 0, opacity: 1 });
+}, 6000);
 
 /* 4 · scroll reveals */
 initReveals();
