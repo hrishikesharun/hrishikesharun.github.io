@@ -13,9 +13,11 @@
       flat side on. z also drives zIndex so tiles sort correctly
       against each other without any depth buffer.
 
-   2. STAGGER. Tile i runs at progress * totalRange - i * STAGGER,
+   2. STAGGER. Tile i runs at progress * totalRange - i * stagger,
       so each one trails the last around the ring instead of the
-      whole set moving as a block.
+      whole set moving as a block. The stagger is derived from
+      SPREAD rather than fixed, so the fan covers the same arc
+      whatever the tile count.
 
    3. BEND. A flat photograph on a curved path still reads flat.
       Tiles that carry an image are cut into vertical slices, each
@@ -30,7 +32,7 @@
 
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import { projects } from './data/projects.js';
+import { projects, galleryExtras } from './data/projects.js';
 
 const SLICES = 10; /* vertical cuts per image tile, more = smoother curve */
 const MIN_TILES = 2; /* below this the ring looks broken, so hide the section */
@@ -87,7 +89,7 @@ export async function initGallery() {
   /* One project can contribute several tiles. The arc reads project.image,
      the ring walks project.gallery when present so a build photo and a CAD
      sheet can both orbit while still belonging to the same entry. */
-  const wanted = projects.flatMap((p) => {
+  const wanted = [...projects, ...galleryExtras].flatMap((p) => {
     const list = p.gallery || (p.image ? [p.image] : []);
     return list.map((src) => ({ project: p, src }));
   });

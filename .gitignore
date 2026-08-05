@@ -33,3 +33,8 @@ Thumbs.db
 
 # local backup of the pre-Vite single file
 index.html.orig-backup
+
+# full size source imagery. Drop originals here and run
+# python scripts/optimize-images.py, which writes the optimised
+# WebP versions into public/assets/projects/ where the site reads them.
+images/

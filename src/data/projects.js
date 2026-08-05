@@ -24,7 +24,7 @@ export const projects = [
     title: 'Jenny.ai',
     blurb: 'Multi-agent desktop assistant that takes real actions.',
     year: '2026',
-    image: asset('jenny.png'),
+    image: asset('jenny.webp'),
     fit: 'contain', /* a UI screenshot, show all of it rather than crop it */
     scale: 1.3, /* the flagship build, given more presence in the ring */
     description:
@@ -35,10 +35,8 @@ export const projects = [
     title: 'Prosthetic hand',
     blurb: '3D printed paediatric hand. Best design in cohort.',
     year: '2023',
-    /* Pre-wired. Each of these joins the ring the moment the file exists in
-       public/assets/projects, and is silently skipped until then. */
-    image: asset('prosthetic-hand.jpg'),
-    gallery: [asset('prosthetic-hand.jpg'), asset('prosthetic-hand-cad.png')],
+    image: asset('prosthetic-hand.webp'),
+    gallery: [asset('prosthetic-hand.webp'), asset('prosthetic-hand-cad.webp')],
     description:
       'Led a four person team designing a 3D printed paediatric prosthetic hand, built from child-safe materials with shock absorption and thermal safety designed in. Fingers split into two sections with slanted tips for grip, fishing wire routed through pulleys to servo motors to close them, and nylon elastic cord to return them open. Hollow palm housing the electronics, with accelerometer and temperature sensing inside and force sensing on the outer surface. Awarded best biomedical engineering design in the cohort.',
     tags: ['Fusion 360', 'Servo actuation', 'Arduino', 'Sensor integration', 'Team lead'],
@@ -47,7 +45,7 @@ export const projects = [
     title: 'Mechanical gripper',
     blurb: 'Gear-driven jaws that hold any shape.',
     year: '2025',
-    image: asset('gripper.jpg'), /* pre-wired, appears once the file is saved */
+    image: asset('gripper.webp'),
     description:
       'A two-jaw gripper designed in Fusion 360 and 3D printed, driven through a gear train off a single Dynamixel servo so both jaws stay synchronised from one actuator. Tested against objects of varying shape and size, and it held all of them.',
     tags: ['Fusion 360', '3D printing', 'Dynamixel servo', 'Mechanism design'],
@@ -56,7 +54,7 @@ export const projects = [
     title: 'NHS patient management system',
     blurb: 'C++ patient database with secure search.',
     year: '2025',
-    image: asset('nhs-flowchart.png'),
+    image: asset('nhs-flowchart.webp'),
     invert: true, /* exported on white, flipped to sit on the dark page */
     fit: 'contain', /* a tall flowchart, letterbox it rather than crop it */
     description:
@@ -71,5 +69,20 @@ export const projects = [
     description:
       'Final year individual project, awaiting allocation. Submitted preferences centre on wearable diagnostics and clinical signal processing, which is the direction the rest of my final year is pointed. Details here once the topic is confirmed.',
     tags: ['Signal processing', 'Algorithm design', 'Python', 'Awaiting allocation'],
+  },
+];
+
+/* ============================================================
+   GALLERY EXTRAS
+   Work that belongs in the ring but is not a project in its own
+   right, so it never appears in the arc list. The Layqa storefront
+   is the deliverable from the Digital Consultant role rather than a
+   separate project, but it is real shipped work and worth showing.
+   ============================================================ */
+export const galleryExtras = [
+  {
+    title: 'Layqa Perfumes',
+    blurb: 'Next.js storefront for a Dubai fragrance brand.',
+    image: asset('layqa.webp'),
   },
 ];
