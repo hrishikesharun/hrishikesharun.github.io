@@ -98,4 +98,81 @@ export function initReveals() {
       scrollTrigger: { trigger: img, start: 'top bottom', end: 'bottom top', scrub: true },
     })
   );
+
+  /* Section labels drift up as their section arrives. */
+  gsap.utils.toArray('.eyebrow,.certs-head').forEach((el) =>
+    gsap.from(el, {
+      y: 14,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 92%' },
+    })
+  );
+
+  /* Certification cards, same batched entrance as the capability tiles. */
+  ScrollTrigger.batch('.cert', {
+    start: 'top 90%',
+    onEnter: (b) =>
+      gsap.to(b, { y: 0, opacity: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }),
+  });
+
+  /* The recommendation card itself. */
+  gsap.utils.toArray('.rec').forEach((el) =>
+    gsap.from(el, {
+      y: 34,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%' },
+    })
+  );
+
+  /* Quoted text resolves word by word out of a blur as it scrolls in, the
+     same treatment the orbit phrase uses, so the two read as one idea. */
+  gsap.utils.toArray('[data-words]').forEach((el) => {
+    const words = splitWords(el);
+    gsap.fromTo(
+      words,
+      { opacity: 0.12, filter: 'blur(7px)' },
+      {
+        opacity: 1,
+        filter: 'blur(0px)',
+        ease: 'none',
+        stagger: 0.5,
+        scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 62%', scrub: true },
+      }
+    );
+  });
+}
+
+/**
+ * Wrap every word of an element in its own span so they can be staggered.
+ * Walks text nodes rather than touching innerHTML, so inline markup such as
+ * the emphasised phrase inside a quote survives intact.
+ * @param {Element} el
+ * @returns {HTMLElement[]}
+ */
+function splitWords(el) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+
+  const words = [];
+  nodes.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.textContent.split(/(\s+)/).forEach((chunk) => {
+      if (/^\s+$/.test(chunk)) {
+        frag.appendChild(document.createTextNode(chunk));
+      } else if (chunk) {
+        const span = document.createElement('span');
+        span.className = 'word';
+        span.textContent = chunk;
+        frag.appendChild(span);
+        words.push(span);
+      }
+    });
+    node.parentNode.replaceChild(frag, node);
+  });
+  return words;
 }

@@ -1,10 +1,17 @@
 :root{
-  --bg:#080909;
-  --surface:#0E1011;
-  --fg:#F2F3F2;
-  --muted:#83898B;
-  --line:rgba(242,243,242,.13);
+  /* Lifted off near black. The old #080909 was dark enough that every
+     surface, border and body copy collapsed into the same flat plane.
+     Raising the base, the surface and the muted tone separates them again
+     without touching the palette's character. */
+  --bg:#0B0C0E;
+  --surface:#15181B;
+  --fg:#F4F5F4;
+  --muted:#98A0A3;
+  --line:rgba(242,243,242,.17);
   --accent:#FF8A5B;
+  /* Ambient wash used to stop large sections reading as flat black */
+  --glow:rgba(255,138,91,.055);
+  --glow-soft:rgba(255,138,91,.035);
   --sans:'General Sans','Helvetica Neue',Arial,sans-serif;
   --display:'Satoshi','General Sans',sans-serif;
   --serif:'Playfair Display',Georgia,serif;
@@ -199,10 +206,64 @@ section{position:relative}
 .role .org{font-size:13px;color:var(--accent);margin-top:5px}
 .role p{margin-top:11px;font-size:14px;line-height:1.62;color:var(--muted);max-width:56ch}
 
+/* ---------- RECOMMENDATION ---------- */
+.rec{margin-top:clamp(52px,7vh,86px);padding:clamp(30px,4vw,52px);position:relative;
+  border:1px solid var(--line);background:var(--surface);
+  display:grid;grid-template-columns:1fr auto;gap:clamp(26px,4vw,60px);align-items:end}
+.rec::before{content:'\201C';position:absolute;top:-.09em;left:.18em;
+  font-family:var(--serif);font-style:italic;font-size:clamp(90px,10vw,150px);
+  line-height:1;color:var(--accent);opacity:.2;pointer-events:none}
+.rec-quote{position:relative;font-family:var(--display);font-weight:500;
+  font-size:clamp(15px,1.55vw,21px);line-height:1.55;letter-spacing:-.014em;
+  color:var(--fg);max-width:64ch}
+.rec-quote em{font-family:var(--serif);font-style:italic;color:var(--accent)}
+/* Each word is wrapped by splitWords so it can resolve out of blur on scroll */
+.rec-quote .word{display:inline-block;will-change:opacity,filter}
+.rec-by{display:flex;flex-direction:column;gap:4px;text-align:right;white-space:nowrap}
+.rec-name{font-family:var(--display);font-weight:500;font-size:14px;color:var(--fg)}
+.rec-role{font-size:12.5px;color:var(--accent)}
+.rec-meta{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--muted);
+  text-transform:uppercase;margin-top:3px}
+@media(max-width:760px){
+  .rec{grid-template-columns:1fr;gap:26px}
+  .rec-by{text-align:left;white-space:normal}
+}
+
+/* ---------- CERTIFICATIONS ---------- */
+.certs{margin-top:clamp(56px,8vh,96px)}
+.certs-head{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:26px}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line)}
+.cert{background:var(--bg);padding:26px 24px 22px;display:flex;flex-direction:column;
+  position:relative;opacity:0;transform:translateY(24px);
+  transition:background .4s var(--ease)}
+.cert:hover{background:var(--surface)}
+.cert-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  margin-bottom:14px}
+.cert-issuer{font-size:12px;color:var(--accent)}
+.cert-when{font-family:var(--mono);font-size:10px;letter-spacing:.13em;color:var(--muted);
+  white-space:nowrap}
+.cert h4{font-family:var(--display);font-weight:500;font-size:17px;letter-spacing:-.014em;
+  margin-bottom:9px}
+.cert p{font-size:13px;line-height:1.6;color:var(--muted);flex:1}
+.cert-id{margin-top:16px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+  color:var(--muted);opacity:.65}
+.cert.pending h4::after{content:'';display:inline-block;width:5px;height:5px;
+  border-radius:50%;background:var(--accent);margin-left:9px;vertical-align:middle;
+  animation:pulse 2.2s infinite}
+
 /* ---------- EDUCATION ---------- */
 /* Reuses .role so the entries animate and sit on the same rhythm as
    Experience, but full width with no accompanying photograph. */
-.edu{padding:clamp(90px,15vh,180px) var(--pad);border-top:1px solid var(--line)}
+/* Ambient washes. Painted as section backgrounds rather than pseudo elements
+   so they sit behind the content without a stacking context fight. They exist
+   purely to stop these long sections reading as flat black. */
+.edu{padding:clamp(90px,15vh,180px) var(--pad);border-top:1px solid var(--line);
+  background:radial-gradient(78% 52% at 12% 4%,var(--glow),transparent 72%)}
+.exp{background:radial-gradient(66% 46% at 92% 0%,var(--glow-soft),transparent 70%)}
+.skills{background:radial-gradient(70% 48% at 6% 100%,var(--glow-soft),transparent 72%)}
+.contact{background:radial-gradient(64% 58% at 88% 96%,var(--glow),transparent 72%)}
 .edu .role{max-width:none}
 .edu .role p{max-width:72ch}
 

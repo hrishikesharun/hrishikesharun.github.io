@@ -39,7 +39,9 @@ void main(){
   f*=1.-smoothstep(.14,1.18,length(uv*vec2(.76,1.)));
   vec3 hot=hsv2rgb(vec3(uHue.x,uHue.y*.70,uHue.z));
   vec3 mid=hsv2rgb(vec3(uHue.x-.05,uHue.y,uHue.z*.56));
-  vec3 col=mix(vec3(.031,.035,.035),mid,smoothstep(.02,.54,f));
+  /* Darkest tone matches --bg in the CSS. If these drift apart the vignette
+     fades to a different black than the shader's own floor and the seam shows. */
+  vec3 col=mix(vec3(.043,.047,.055),mid,smoothstep(.02,.54,f));
   col=mix(col,hot,smoothstep(.44,1.,f));
   col+=(hash(gl_FragCoord.xy+uTime)-.5)*.024;   /* grain kills banding */
   o=vec4(col,1.);
