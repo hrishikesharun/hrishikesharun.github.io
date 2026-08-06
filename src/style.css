@@ -4,6 +4,7 @@
      Raising the base, the surface and the muted tone separates them again
      without touching the palette's character. */
   --bg:#0B0C0E;
+  --bg-rgb:11,12,14; /* same colour as --bg, for gradients that need alpha */
   --surface:#15181B;
   --fg:#F4F5F4;
   --muted:#98A0A3;
@@ -60,6 +61,25 @@ img{display:block;max-width:100%}
 .hero-canvas canvas{width:100%;height:100%}
 .hero-vig{position:absolute;inset:0;z-index:1;pointer-events:none;
   background:radial-gradient(125% 105% at 50% 42%,transparent 22%,var(--bg) 90%)}
+/* Bottom blend into the page.
+   The vignette above cannot do this on its own: in radial-gradient the 125%
+   and 105% are RADII, not diameters, so the ellipse is centred at 42% height
+   with a vertical radius of 105% of the hero. The hero's bottom edge lands at
+   only about 55% along that gradient, between the transparent stop at 22% and
+   the solid stop at 90%, leaving the vignette roughly half opaque there. Half
+   the shader was still showing at the exact row where the section ends, so it
+   cut off as a hard horizontal line. This eases the last stretch fully to the
+   page colour before the edge is reached. Sits at z-index 1 as an ::after so
+   it paints over .hero-vig but still below .hero-inner at z-index 2, leaving
+   the wordmark and the bar untouched. */
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:46%;
+  z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom,
+    rgba(var(--bg-rgb),0) 0%,
+    rgba(var(--bg-rgb),.30) 38%,
+    rgba(var(--bg-rgb),.68) 64%,
+    rgba(var(--bg-rgb),.92) 84%,
+    rgba(var(--bg-rgb),1) 95%)}
 .hero-inner{position:relative;z-index:2;height:100%;padding:var(--pad);
   display:flex;flex-direction:column;justify-content:flex-end;gap:clamp(28px,6vh,64px)}
 .tagline{max-width:36ch;font-size:clamp(13px,1.05vw,15.5px);line-height:1.55;
