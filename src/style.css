@@ -34,7 +34,6 @@ img{display:block;max-width:100%}
 #loader{position:fixed;inset:0;z-index:300;background:var(--bg);display:grid;place-items:center;
   transition:opacity .9s var(--ease),visibility .9s}
 #loader.done{opacity:0;visibility:hidden}
-#loader .num{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--muted)}
 
 /* ---------- CURSOR ---------- */
 /* No mix-blend-mode here. Difference blending inverted whatever sat under
