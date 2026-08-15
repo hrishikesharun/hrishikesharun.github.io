@@ -1,5 +1,5 @@
 /* ============================================================
-   CIRCLE GALLERY — 3D orbiting project tiles
+   CIRCLE GALLERY, 3D orbiting project tiles
 
    A pinned section where every project tile travels a full 360
    degree orbit through 3D space as you scroll.

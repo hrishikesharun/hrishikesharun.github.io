@@ -1,5 +1,5 @@
 /* ============================================================
-   THE ARC — pinned cosine-offset project list
+   THE ARC, pinned cosine-offset project list
 
    The section pins and the scroll progress drives a floating
    "centre" index across the list. Each item is pushed right by

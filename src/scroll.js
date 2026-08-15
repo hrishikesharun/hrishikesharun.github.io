@@ -48,14 +48,27 @@ export function initSmoothScroll() {
  * queries the .reveal-line spans that wrapping creates.
  */
 export function initReveals() {
-  gsap.utils.toArray('.reveal-line>span').forEach((s) =>
+  gsap.utils.toArray('.reveal-line>span').forEach((s) => {
+    /* Restate the hidden position in GSAP's own terms before tweening it.
+       CSS parks the span at translateY(105%). GSAP reads that back out of the
+       computed matrix as a base pixel offset, not as yPercent, so a tween to
+       yPercent:0 only ever cancels a percentage layer sitting on top of that
+       base and the line stays exactly where it was. Setting y:0 clears the
+       inherited pixels and yPercent:105 restates the hide, so the tween now
+       has something to actually remove. Same reason main.js takes ownership
+       of the wordmark's hidden state in JS rather than leaving it to CSS. */
+    gsap.set(s, { y: 0, yPercent: 105 });
+
     gsap.to(s, {
       yPercent: 0,
       duration: 1.15,
       ease: 'expo.out',
-      scrollTrigger: { trigger: s, start: 'top 86%' },
-    })
-  );
+      /* Trigger off the clipping parent, never the span itself: the span is
+         displaced by the very transform this tween removes, so it would be
+         measuring a start position that moves as it runs. */
+      scrollTrigger: { trigger: s.parentElement, start: 'top 86%' },
+    });
+  });
 
   gsap.utils.toArray('[data-fade]').forEach((s) =>
     gsap.from(s, {

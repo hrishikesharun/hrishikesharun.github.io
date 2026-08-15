@@ -1,5 +1,5 @@
 /* ============================================================
-   WEBGL2 HERO — domain-warped fractal Brownian motion
+   WEBGL2 HERO, domain-warped fractal Brownian motion
 
    Renders a single full-screen triangle and does all the work in
    the fragment shader. Nothing is loaded, nothing is textured:
@@ -47,7 +47,7 @@ void main(){
   o=vec4(col,1.);
 }`;
 
-const HUE = [0.045, 0.88, 0.95]; /* ember: h,s,v — edit here to reskin the hero */
+const HUE = [0.045, 0.88, 0.95]; /* ember: h,s,v, edit here to reskin the hero */
 
 function compile(gl, type, src) {
   const shader = gl.createShader(type);

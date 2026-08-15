@@ -17,6 +17,8 @@ import gsap from 'gsap';
 
 import { initShader } from './shader.js';
 import { initSmoothScroll, initReveals } from './scroll.js';
+import { initAbout } from './about.js';
+import { initLinks } from './links.js';
 import { initArc } from './arc.js';
 import { initGallery } from './gallery.js';
 import { initCursor } from './cursor.js';
@@ -96,6 +98,14 @@ setTimeout(() => {
 
 /* 4 · scroll reveals */
 initReveals();
+
+/* 4b · about section choreography. Owns its own word masks, so it has to
+        run after (3) has finished rewriting any [data-split] markup. */
+initAbout();
+
+/* 4c · nav and social link character roll. Rewrites the text of those links,
+        so it has to run before anything else reads their contents. */
+initLinks();
 
 /* 5 · the pinned arc, rendered from src/data/projects.js */
 initArc();
