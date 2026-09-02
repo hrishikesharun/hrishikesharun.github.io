@@ -57,15 +57,62 @@ const PHRASE_END = 0.75;
 const PHRASE_TRAVEL = 200; /* px of vertical drift across the phrase */
 const BLUR = 8; /* px blur each word resolves from */
 
+/**
+ * Mobile stand-in for the ring. A snap scrolling strip of the same images,
+ * laid out horizontally so the section still shows the work without asking a
+ * phone to render a perspective ring or to give up its vertical scroll.
+ */
+function buildStrip(pin) {
+  const items = [...projects, ...galleryExtras].flatMap((p) => {
+    const list = p.gallery || (p.image ? [p.image] : []);
+    return list.map((src) => ({ title: p.title, src }));
+  });
+  if (!items.length) return;
+
+  const strip = document.createElement('div');
+  strip.className = 'cg-strip';
+
+  items.forEach(({ title, src }) => {
+    const fig = document.createElement('figure');
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = title;
+    img.loading = 'lazy';
+    /* Drop rather than leave a broken frame, same rule the ring follows. */
+    img.onerror = () => fig.remove();
+    const cap = document.createElement('figcaption');
+    cap.textContent = title;
+    fig.append(img, cap);
+    strip.appendChild(fig);
+  });
+
+  pin.appendChild(strip);
+
+  gsap.set(strip.children, { y: 22, opacity: 0 });
+  gsap.to(strip.children, {
+    y: 0,
+    opacity: 1,
+    duration: 0.7,
+    stagger: 0.07,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: strip, start: 'top 88%' },
+  });
+}
+
 export async function initGallery() {
   const section = document.getElementById('gallery');
   const pin = document.getElementById('gallery-pin');
   const phrase = document.getElementById('cg-phrase');
   if (!section || !pin || !phrase) return;
 
-  /* The arc uses the same breakpoint. Below it the section is hidden by
-     CSS and we never build the tiles at all. */
-  if (!matchMedia('(min-width:901px)').matches) return;
+  /* The arc uses the same breakpoint. Below it the ring is replaced rather
+     than hidden: a 360 degree orbit needs width to read as depth, and at
+     phone widths the tiles end up too small to see and fight the page for
+     the same vertical drag. The strip carries the same images. */
+  if (!matchMedia('(min-width:901px)').matches) {
+    buildStrip(pin);
+    return;
+  }
 
   const vw = innerWidth;
   const vh = innerHeight;

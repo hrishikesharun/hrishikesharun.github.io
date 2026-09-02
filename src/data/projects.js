@@ -28,7 +28,7 @@ export const projects = [
     fit: 'contain', /* a UI screenshot, show all of it rather than crop it */
     scale: 1.3, /* the flagship build, given more presence in the ring */
     description:
-      'A multi-agent desktop assistant that takes real actions rather than just answering. Tool orchestration, retrieval over a persistent memory store, streaming responses with inspectable tool receipts, and a human-in-the-loop approval gate before anything executes.',
+      'A multi-agent desktop assistant that takes real actions rather than just answering. Tool orchestration across 41 declared tools, retrieval over a persistent memory store, streaming responses with inspectable tool receipts, and a human-in-the-loop approval gate before anything executes. Held together by 17 automated test suites.',
     tags: ['Claude API', 'RAG', 'Electron', 'React', 'Python', 'WebSocket'],
   },
   {

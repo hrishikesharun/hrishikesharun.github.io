@@ -41,6 +41,9 @@ export function initArc() {
   });
 
   const N = items.length;
+  /* Read once. Querying per paint would let a mid session resize leave half
+     the list transformed and half not. */
+  const DESKTOP = matchMedia('(min-width:901px)').matches;
   let active = -1;
   let pendingShow = null;
 
@@ -92,16 +95,24 @@ export function initArc() {
   }
 
   function paint(centre) {
-    items.forEach((li, i) => {
-      const d = i - centre;
-      const ad = Math.abs(d);
-      gsap.set(li, {
-        x: CURVE * (1 - Math.cos(d * 0.38)),
-        opacity: 1 - Math.min(ad * 0.23, 0.75),
-        scale: 1 - Math.min(ad * 0.052, 0.29),
-        transformOrigin: '0% 50%',
+    /* The curve only means anything while scroll is driving the centre index
+       across the list. Without the pin there is nothing to drive it, so the
+       geometry would freeze at whatever paint() was last called with and the
+       list would just look like a broken staircase of indented, half faded
+       items. Below the breakpoint the list stays flat and fully legible and
+       the active item is marked by class alone. */
+    if (DESKTOP) {
+      items.forEach((li, i) => {
+        const d = i - centre;
+        const ad = Math.abs(d);
+        gsap.set(li, {
+          x: CURVE * (1 - Math.cos(d * 0.38)),
+          opacity: 1 - Math.min(ad * 0.23, 0.75),
+          scale: 1 - Math.min(ad * 0.052, 0.29),
+          transformOrigin: '0% 50%',
+        });
       });
-    });
+    }
 
     const idx = Math.round(Math.min(Math.max(centre, 0), N - 1));
     if (idx !== active) {
@@ -114,7 +125,7 @@ export function initArc() {
 
   paint(0);
 
-  if (matchMedia('(min-width:901px)').matches) {
+  if (DESKTOP) {
     ScrollTrigger.create({
       trigger: '.work',
       start: 'top top',
