@@ -22,14 +22,23 @@ const asset = (file) => `${import.meta.env.BASE_URL}assets/projects/${file}`;
 export const projects = [
   {
     title: 'Jenny.ai',
-    blurb: 'Multi-agent desktop assistant that takes real actions.',
+    blurb: 'Desktop assistant that acts, but never on its own.',
     year: '2026',
     image: asset('jenny.webp'),
     fit: 'contain', /* a UI screenshot, show all of it rather than crop it */
     scale: 1.3, /* the flagship build, given more presence in the ring */
     description:
-      'A multi-agent desktop assistant that takes real actions rather than just answering. Tool orchestration across 41 declared tools, retrieval over a persistent memory store, streaming responses with inspectable tool receipts, and a human-in-the-loop approval gate before anything executes. Held together by 17 automated test suites.',
-    tags: ['Claude API', 'RAG', 'Electron', 'React', 'Python', 'WebSocket'],
+      'A Windows desktop AI assistant that reads live data from Gmail, Blackboard, six job boards, LinkedIn and local files, and acts on the machine through 41 tools. Two rules shape the build: she may not state anything she has not actually read, and the model never changes anything itself. Every state change comes from deterministic code, with confirmation gates on destructive or outbound actions, so nothing can be hallucinated into existence. Four processes, each existing because the one above it cannot do the job, covered by 17 regression suites that test functions extracted from the shipped source.',
+    tags: ['Claude API', 'Electron', 'React', 'Node.js', 'Cloudflare Workers', '17 test suites'],
+  },
+  {
+    title: 'Deep Brain Stimulation',
+    blurb: 'Final year project. Machine learning on neural recordings.',
+    year: '2027',
+    image: null,
+    description:
+      'Final year research project under Prof S. Nasuto: developing machine learning methods to identify and remove stimulation artefacts from brain recordings of patients undergoing Deep Brain Stimulation. Ongoing, with results to follow here.',
+    tags: ['Signal processing', 'Machine learning', 'Neural recordings', 'Ongoing'],
   },
   {
     title: 'Prosthetic hand',
@@ -51,38 +60,29 @@ export const projects = [
     tags: ['Fusion 360', '3D printing', 'Dynamixel servo', 'Mechanism design'],
   },
   {
-    title: 'NHS patient management system',
-    blurb: 'C++ patient database with secure search.',
+    title: 'Patient management system',
+    blurb: 'C++ patient database with record search.',
     year: '2024',
     image: asset('nhs-flowchart.webp'),
     invert: true, /* exported on white, flipped to sit on the dark page */
     fit: 'contain', /* a tall flowchart, letterbox it rather than crop it */
     description:
-      'A C++ patient database simulating the full clinical admin loop: registration, record updates, secure search, symptom and medical history edits, appointment scheduling and cancellation, and discharge. Records persist to disk on exit, with validation on every branch rather than only the happy path.',
+      'A C++ patient database simulating the full clinical admin loop: registration, record updates, record search, symptom and medical history edits, appointment scheduling and cancellation, and discharge. Records persist to disk on exit, with validation on every branch rather than only the happy path.',
     tags: ['C++', 'Data structures', 'File persistence', 'Healthcare records'],
-  },
-  {
-    title: 'Final year individual project',
-    blurb: 'Wearable diagnostics. Awaiting allocation.',
-    year: '2027',
-    image: null,
-    description:
-      'Final year individual project, awaiting allocation. Submitted preferences centre on wearable diagnostics and clinical signal processing, which is the direction the rest of my final year is pointed. Details here once the topic is confirmed.',
-    tags: ['Signal processing', 'Algorithm design', 'Python', 'Awaiting allocation'],
   },
 ];
 
 /* ============================================================
    GALLERY EXTRAS
    Work that belongs in the ring but is not a project in its own
-   right, so it never appears in the arc list. The Layqa storefront
-   is the deliverable from the Digital Consultant role rather than a
-   separate project, but it is real shipped work and worth showing.
+   right, so it never appears in the arc list. The Layqa work came out
+   of the Digital Consultant role rather than being a project of its
+   own, but it is real work and worth showing.
    ============================================================ */
 export const galleryExtras = [
   {
     title: 'Layqa Perfumes',
-    blurb: 'Next.js storefront for a Dubai fragrance brand.',
+    blurb: 'Website and digital content for a Dubai fragrance brand.',
     image: asset('layqa.webp'),
   },
 ];
