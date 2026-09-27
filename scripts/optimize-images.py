@@ -77,9 +77,9 @@ def main():
         )
 
     # the flowchart came from elsewhere, shrink it in place if still a PNG
-    legacy = os.path.join(OUT, "nhs-flowchart.png")
+    legacy = os.path.join(OUT, "patient-records-flowchart.png")
     if os.path.exists(legacy):
-        out_path = os.path.join(OUT, "nhs-flowchart.webp")
+        out_path = os.path.join(OUT, "patient-records-flowchart.webp")
         before, after = optimise(legacy, out_path, True)
         b = os.path.getsize(legacy) / 1024
         a = os.path.getsize(out_path) / 1024
@@ -87,7 +87,7 @@ def main():
         total_after += a
         print(
             "%-30s %sx%s -> %sx%s  %7.0f KB -> %6.0f KB  (-%.0f%%)"
-            % ("nhs-flowchart.webp", before[0], before[1], after[0], after[1], b, a, 100 * (1 - a / b))
+            % ("patient-records-flowchart.webp", before[0], before[1], after[0], after[1], b, a, 100 * (1 - a / b))
         )
         os.remove(legacy)
 

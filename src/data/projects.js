@@ -63,7 +63,7 @@ export const projects = [
     title: 'Patient management system',
     blurb: 'C++ patient database with record search.',
     year: '2024',
-    image: asset('nhs-flowchart.webp'),
+    image: asset('patient-records-flowchart.webp'),
     invert: true, /* exported on white, flipped to sit on the dark page */
     fit: 'contain', /* a tall flowchart, letterbox it rather than crop it */
     description:
