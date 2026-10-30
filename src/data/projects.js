@@ -37,7 +37,7 @@ export const projects = [
     year: '2027',
     image: null,
     description:
-      'Final year research project under Prof S. Nasuto: developing machine learning methods to identify and remove stimulation artefacts from brain recordings of patients undergoing Deep Brain Stimulation. Ongoing, with results to follow here.',
+      'Final year research project under Prof S. Nasuto: building a machine learning pipeline that localises the subthalamic nucleus from intraoperative microelectrode recordings, to support accurate targeting during Deep Brain Stimulation surgery. Ongoing, with results to follow here.',
     tags: ['Signal processing', 'Machine learning', 'Neural recordings', 'Ongoing'],
   },
   {
